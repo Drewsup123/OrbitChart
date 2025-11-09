@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import type { CSSProperties } from 'react';
+
 export type RadialOrbitItem = {
   id: string;
   label: string;
@@ -46,6 +48,5 @@ export type RadialOrbitProps = {
     center?: string;
     tooltip?: string;
   };
-  className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 };

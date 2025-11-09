@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import type {
   RadialOrbitProps,
   RadialOrbitGroup,
@@ -37,7 +37,6 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
     center: '#1a1a1a',
     tooltip: 'rgba(0, 0, 0, 0.9)',
   },
-  className = '',
   style = {},
 }) => {
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
@@ -91,8 +90,8 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
         y: event.clientY,
         content: (
           <div>
-            <div className="font-semibold text-sm">{group.label}</div>
-            <div className="text-xs opacity-75">{group.items.length} items</div>
+            <div style={{ fontWeight: 600, fontSize: '14px' }}>{group.label}</div>
+            <div style={{ fontSize: '12px', opacity: 0.75 }}>{group.items.length} items</div>
           </div>
         ),
       });
@@ -113,10 +112,10 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
         y: event.clientY,
         content: (
           <div>
-            <div className="font-semibold text-sm">{item.label}</div>
-            <div className="text-xs opacity-75">Value: {item.value}</div>
+            <div style={{ fontWeight: 600, fontSize: '14px' }}>{item.label}</div>
+            <div style={{ fontSize: '12px', opacity: 0.75 }}>Value: {item.value}</div>
             {item.meta && (
-              <div className="text-xs opacity-60 mt-1">
+              <div style={{ fontSize: '12px', opacity: 0.6, marginTop: '4px' }}>
                 {Object.entries(item.meta)
                   .slice(0, 3)
                   .map(([key, val]) => (
@@ -150,8 +149,8 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
 
   return (
     <div
-      className={`relative ${className}`}
       style={{
+        position: 'relative',
         width,
         height,
         background: colors.background,
@@ -161,8 +160,14 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
       <svg
         width={width}
         height={height}
-        className="absolute inset-0"
-        style={{ overflow: 'visible' }}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          overflow: 'visible',
+        }}
       >
         <defs>
           <filter id="glow">
@@ -353,8 +358,14 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
 
       {tooltip.visible && (
         <div
-          className="fixed z-50 pointer-events-none px-3 py-2 rounded-lg shadow-lg text-white"
           style={{
+            position: 'fixed',
+            zIndex: 50,
+            pointerEvents: 'none',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            color: 'white',
             left: tooltip.x + 15,
             top: tooltip.y + 15,
             backgroundColor: colors.tooltip,

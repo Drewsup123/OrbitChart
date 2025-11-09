@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import RadialOrbit from './components/RadialOrbit';
 import { demoOrbitData } from './data/demo-orbit-data';
 import type { RadialOrbitGroup, RadialOrbitItem } from './types/radial-orbit';
@@ -7,6 +7,16 @@ function App() {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedDial, setSelectedDial] = useState<number | null>(null);
+  const [dimensions, setDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDimensions({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleGroupSelect = (group: RadialOrbitGroup) => {
     setSelectedGroup(group.id);
@@ -24,58 +34,95 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center p-8">
-      <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-slate-700">
-        <RadialOrbit
-          data={demoOrbitData}
-          width={900}
-          height={900}
-          sortableBy="value"
-          onGroupSelect={handleGroupSelect}
-          onItemSelect={handleItemSelect}
-          onDialSelect={handleDialSelect}
-          animation={{
-            orbitRotation: true,
-            orbitSpeedBase: 80,
-            hoverScale: 1.15,
-          }}
-          colors={{
-            background: 'transparent',
-            ring: 'rgba(100, 116, 139, 0.3)',
-            center: '#1e293b',
-            tooltip: 'rgba(15, 23, 42, 0.95)',
-          }}
-        />
-      </div>
+    <div
+      style={{
+        width: '100vw',
+        height: '100vh',
+        margin: 0,
+        padding: 0,
+        overflow: 'hidden',
+        background: 'linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a)',
+        position: 'relative',
+      }}
+    >
+      <RadialOrbit
+        data={demoOrbitData}
+        width={dimensions.width}
+        height={dimensions.height}
+        sortableBy="value"
+        onGroupSelect={handleGroupSelect}
+        onItemSelect={handleItemSelect}
+        onDialSelect={handleDialSelect}
+        animation={{
+          orbitRotation: true,
+          orbitSpeedBase: 80,
+          hoverScale: 1.15,
+        }}
+        colors={{
+          background: 'transparent',
+          ring: 'rgba(100, 116, 139, 0.3)',
+          center: '#1e293b',
+          tooltip: 'rgba(15, 23, 42, 0.95)',
+        }}
+      />
 
-      <div className="mt-8 flex gap-6 text-sm">
-        {selectedGroup && (
-          <div className="bg-slate-800/70 px-4 py-2 rounded-lg border border-slate-700">
-            <span className="text-slate-400">Selected Group:</span>{' '}
-            <span className="text-white font-semibold">{selectedGroup}</span>
-          </div>
-        )}
-        {selectedItem && (
-          <div className="bg-slate-800/70 px-4 py-2 rounded-lg border border-slate-700">
-            <span className="text-slate-400">Selected Item:</span>{' '}
-            <span className="text-white font-semibold">{selectedItem}</span>
-          </div>
-        )}
-        {selectedDial !== null && (
-          <div className="bg-slate-800/70 px-4 py-2 rounded-lg border border-slate-700">
-            <span className="text-slate-400">Selected Dial:</span>{' '}
-            <span className="text-white font-semibold">{selectedDial}</span>
-          </div>
-        )}
-      </div>
-
-      <div className="mt-8 max-w-2xl text-center space-y-2">
-        <p className="text-slate-400 text-sm">
-          <strong className="text-white">Hover</strong> over rings or items to see details •
-          <strong className="text-white"> Click</strong> rings, items, or dial ticks to select •
-          <strong className="text-white"> Watch</strong> the orbital rotation animation
-        </p>
-      </div>
+      {(selectedGroup || selectedItem || selectedDial !== null) && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: '24px',
+            fontSize: '14px',
+            zIndex: 100,
+          }}
+        >
+          {selectedGroup && (
+            <div
+              style={{
+                backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: '1px solid rgba(51, 65, 85, 1)',
+                backdropFilter: 'blur(4px)',
+              }}
+            >
+              <span style={{ color: '#94a3b8' }}>Selected Group:</span>{' '}
+              <span style={{ color: 'white', fontWeight: 600 }}>{selectedGroup}</span>
+            </div>
+          )}
+          {selectedItem && (
+            <div
+              style={{
+                backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: '1px solid rgba(51, 65, 85, 1)',
+                backdropFilter: 'blur(4px)',
+              }}
+            >
+              <span style={{ color: '#94a3b8' }}>Selected Item:</span>{' '}
+              <span style={{ color: 'white', fontWeight: 600 }}>{selectedItem}</span>
+            </div>
+          )}
+          {selectedDial !== null && (
+            <div
+              style={{
+                backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: '1px solid rgba(51, 65, 85, 1)',
+                backdropFilter: 'blur(4px)',
+              }}
+            >
+              <span style={{ color: '#94a3b8' }}>Selected Dial:</span>{' '}
+              <span style={{ color: 'white', fontWeight: 600 }}>{selectedDial}</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
