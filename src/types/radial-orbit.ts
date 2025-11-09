@@ -56,6 +56,15 @@ export type RadialOrbitProps = {
   onItemSelect?: (item: RadialOrbitItem, group: RadialOrbitGroup) => void;
   onDialSelect?: (index: number) => void;
   renderItem?: (props: ItemRendererProps) => ReactNode;
+  groupBy?: boolean;
+  orbitPaths?: {
+    show?: boolean;
+    strokeWidth?: number;
+    strokeDasharray?: string;
+    opacity?: number;
+    hoverStrokeWidth?: number;
+    hoverOpacity?: number;
+  };
   animation?: {
     orbitRotation?: boolean;
     orbitSpeedBase?: number;

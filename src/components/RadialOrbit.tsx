@@ -8,6 +8,7 @@ import {
   valueToRadius,
   sortItems,
   distributeAngles,
+  distributeAnglesGrouped,
   polarToCartesian,
 } from '../utils/radial-orbit-helpers';
 
@@ -27,6 +28,15 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
   onItemSelect,
   onDialSelect,
   renderItem,
+  groupBy = false,
+  orbitPaths = {
+    show: true,
+    strokeWidth: 2,
+    strokeDasharray: '5,5',
+    opacity: 0.7,
+    hoverStrokeWidth: 3,
+    hoverOpacity: 0.9,
+  },
   animation = {
     orbitRotation: true,
     orbitSpeedBase: 60,
@@ -84,7 +94,10 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
       const minValue = Math.min(...allValues);
       const maxValue = Math.max(...allValues);
 
-      const angles = distributeAngles(sortedItems.length);
+      // Use grouped angles if groupBy is enabled, otherwise distribute evenly
+      const angles = groupBy
+        ? distributeAnglesGrouped(sortedItems.length, index, data.groups.length)
+        : distributeAngles(sortedItems.length);
 
       return {
         ...group,
@@ -97,7 +110,7 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
     });
     
     return groups;
-  }, [data.groups, sortableBy, baseOrbitRadius, orbitSpacing, maxAvailableRadius]);
+  }, [data.groups, sortableBy, baseOrbitRadius, orbitSpacing, maxAvailableRadius, groupBy]);
 
   const handleGroupHover = (
     group: RadialOrbitGroup | null,
@@ -206,27 +219,47 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
           </radialGradient>
         </defs>
 
-        {processedGroups.map((group) => (
-          <g key={group.id}>
-            <circle
-              cx={centerX}
-              cy={centerY}
-              r={group.radius}
-              fill="none"
-              stroke={colors.ring}
-              strokeWidth={hoveredGroup === group.id ? 2 : 1}
-              strokeDasharray="5,5"
-              opacity={hoveredGroup === group.id ? 0.6 : 0.3}
-              style={{
-                transition: 'all 0.3s ease',
-                cursor: 'pointer',
-              }}
-              onMouseEnter={(e) => handleGroupHover(group, e)}
-              onMouseLeave={() => handleGroupHover(null)}
-              onClick={() => onGroupSelect?.(group)}
-            />
-          </g>
-        ))}
+        {orbitPaths.show !== false && processedGroups.map((group) => {
+          // Determine ring color based on group type
+          let ringColor = colors.ring;
+          if (group.id === 'finance') {
+            ringColor = 'rgba(16, 185, 129, 0.7)'; // green - more visible
+          } else if (group.id === 'company-stack') {
+            ringColor = 'rgba(234, 179, 8, 0.7)'; // yellow - more visible
+          } else if (group.id === 'shadow-it') {
+            ringColor = 'rgba(239, 68, 68, 0.7)'; // red - more visible
+          }
+
+          const isHovered = hoveredGroup === group.id;
+          const strokeWidth = isHovered 
+            ? (orbitPaths.hoverStrokeWidth ?? orbitPaths.strokeWidth ?? 3)
+            : (orbitPaths.strokeWidth ?? 2);
+          const opacity = isHovered
+            ? (orbitPaths.hoverOpacity ?? orbitPaths.opacity ?? 0.9)
+            : (orbitPaths.opacity ?? 0.7);
+
+          return (
+            <g key={group.id}>
+              <circle
+                cx={centerX}
+                cy={centerY}
+                r={group.radius}
+                fill="none"
+                stroke={ringColor}
+                strokeWidth={strokeWidth}
+                strokeDasharray={orbitPaths.strokeDasharray === 'none' ? 'none' : (orbitPaths.strokeDasharray ?? '5,5')}
+                opacity={opacity}
+                style={{
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => handleGroupHover(group, e)}
+                onMouseLeave={() => handleGroupHover(null)}
+                onClick={() => onGroupSelect?.(group)}
+              />
+            </g>
+          );
+        })}
 
         {dialTicks.map((tick) => (
           <g key={tick.index}>
@@ -332,14 +365,18 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
 
               if (renderItem) {
                 return (
-                  <g
+                <foreignObject
                     key={item.id}
+                    x={pos.x - itemRadius * 0.55}
+                    y={pos.y - itemRadius * 0.55}
+                    width={itemRadius * 1.1}
+                    height={itemRadius * 1.1}
                     style={{
                       animation: 'fadeIn 0.5s ease-out',
                       animationDelay: `${itemIndex * 0.05}s`,
                       animationFillMode: 'backwards',
                     }}
-                  >
+                >
                     {renderItem({
                       item,
                       group,
@@ -357,7 +394,7 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
                       onMouseLeave: () => handleItemHover(null),
                       onClick: () => onItemSelect?.(item, group),
                     })}
-                  </g>
+                  </foreignObject>
                 );
               }
 

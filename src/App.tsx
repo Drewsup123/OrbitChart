@@ -20,6 +20,15 @@ function App() {
     'company-stack': true,
     'shadow-it': true,
   });
+  const [groupBy, setGroupBy] = useState(false);
+  const [orbitPaths, setOrbitPaths] = useState({
+    show: true,
+    strokeWidth: 2,
+    strokeDasharray: '5,5',
+    opacity: 0.7,
+    hoverStrokeWidth: 3,
+    hoverOpacity: 0.9,
+  });
 
   const handleGroupSelect = (group: RadialOrbitGroup) => {
     setSelectedGroup(group.id);
@@ -45,43 +54,26 @@ function App() {
         style={{
           width: size,
           height: size,
-          borderRadius: '12px',
-          border: '2px solid rgba(255, 255, 255, 0.3)',
-          boxShadow: isHovered 
-            ? '0 8px 16px rgba(0, 0, 0, 0.4), 0 0 20px rgba(96, 165, 250, 0.5)' 
-            : '0 4px 8px rgba(0, 0, 0, 0.2)',
+          borderRadius: '50%',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           padding: '8px',
           transition: 'all 0.3s ease',
-          opacity: isHovered ? 1 : 0.85,
           cursor: 'pointer',
           overflow: 'hidden',
+          backgroundColor: "#fff"
         }}
       >
-        <div
-          style={{
-            fontSize: Math.max(8, size * 0.12),
-            fontWeight: 600,
-            color: 'white',
-            textAlign: 'center',
-            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
-            lineHeight: 1.2,
-          }}
-        >
-          {item.label}
-        </div>
-        <div
-          style={{
-            fontSize: Math.max(6, size * 0.1),
-            color: 'rgba(255, 255, 255, 0.8)',
-            marginTop: '2px',
-          }}
-        >
-          {item.value}
-        </div>
+        <div style={{
+          backgroundImage: `url(${item.iconUrl})`,
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          width: '100%',
+          height: '100%',
+        }} />
       </div>
     );
   };
@@ -93,15 +85,6 @@ function App() {
     const halfSize = size / 2;
 
     return (
-      <foreignObject
-        x={position.x - halfSize}
-        y={position.y - halfSize}
-        width={size}
-        height={size}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onClick={onClick}
-      >
         <div
           style={{
             width: '100%',
@@ -113,7 +96,6 @@ function App() {
         >
           <CustomItemCard item={item} isHovered={isHovered} radius={radius} scale={scale} />
         </div>
-      </foreignObject>
     );
   };
 
@@ -332,7 +314,7 @@ function App() {
           </div>
         </div>
 
-        {/* Group Controls */}
+        {/* Filter Types Controls */}
         <div style={{ marginBottom: '32px' }}>
           <h3
             style={{
@@ -344,7 +326,7 @@ function App() {
               letterSpacing: '0.5px',
             }}
           >
-            Groups
+            Filter Types
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {demoOrbitData.groups.map((group) => (
@@ -381,6 +363,239 @@ function App() {
             ))}
           </div>
         </div>
+
+        {/* Group By Control */}
+        <div style={{ marginBottom: '32px' }}>
+          <h3
+            style={{
+              color: '#94a3b8',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginBottom: '12px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}
+          >
+            Layout
+          </h3>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              color: '#cbd5e1',
+              fontSize: '12px',
+              cursor: 'pointer',
+              padding: '8px',
+              borderRadius: '6px',
+              backgroundColor: groupBy ? 'rgba(96, 165, 250, 0.1)' : 'transparent',
+              transition: 'background-color 0.2s',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={groupBy}
+              onChange={(e) => setGroupBy(e.target.checked)}
+              style={{ accentColor: '#60a5fa' }}
+            />
+            Group By Type
+          </label>
+        </div>
+
+        {/* Orbit Paths Controls */}
+        <div style={{ marginBottom: '32px' }}>
+          <h3
+            style={{
+              color: '#94a3b8',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginBottom: '12px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}
+          >
+            Orbit Paths
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: '#cbd5e1',
+                fontSize: '12px',
+                cursor: 'pointer',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={orbitPaths.show}
+                onChange={(e) =>
+                  setOrbitPaths({ ...orbitPaths, show: e.target.checked })
+                }
+                style={{ accentColor: '#60a5fa' }}
+              />
+              Show Paths
+            </label>
+            {orbitPaths.show && (
+              <>
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      color: '#cbd5e1',
+                      fontSize: '12px',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    Stroke Width: {orbitPaths.strokeWidth}px
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="8"
+                    step="0.5"
+                    value={orbitPaths.strokeWidth}
+                    onChange={(e) =>
+                      setOrbitPaths({
+                        ...orbitPaths,
+                        strokeWidth: parseFloat(e.target.value),
+                      })
+                    }
+                    style={{
+                      width: '100%',
+                      accentColor: '#60a5fa',
+                    }}
+                  />
+                </div>
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      color: '#cbd5e1',
+                      fontSize: '12px',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    Style
+                  </label>
+                  <select
+                    value={orbitPaths.strokeDasharray}
+                    onChange={(e) =>
+                      setOrbitPaths({
+                        ...orbitPaths,
+                        strokeDasharray: e.target.value,
+                      })
+                    }
+                    style={{
+                      width: '100%',
+                      padding: '6px 8px',
+                      borderRadius: '6px',
+                      backgroundColor: 'rgba(30, 41, 59, 0.8)',
+                      border: '1px solid rgba(51, 65, 85, 1)',
+                      color: '#cbd5e1',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <option value="none">Solid</option>
+                    <option value="5,5">Dotted</option>
+                    <option value="10,5">Dashed</option>
+                    <option value="2,2">Fine Dotted</option>
+                    <option value="15,5">Long Dashed</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      color: '#cbd5e1',
+                      fontSize: '12px',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    Opacity: {orbitPaths.opacity}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={orbitPaths.opacity}
+                    onChange={(e) =>
+                      setOrbitPaths({
+                        ...orbitPaths,
+                        opacity: parseFloat(e.target.value),
+                      })
+                    }
+                    style={{
+                      width: '100%',
+                      accentColor: '#60a5fa',
+                    }}
+                  />
+                </div>
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      color: '#cbd5e1',
+                      fontSize: '12px',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    Hover Stroke Width: {orbitPaths.hoverStrokeWidth}px
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    step="0.5"
+                    value={orbitPaths.hoverStrokeWidth}
+                    onChange={(e) =>
+                      setOrbitPaths({
+                        ...orbitPaths,
+                        hoverStrokeWidth: parseFloat(e.target.value),
+                      })
+                    }
+                    style={{
+                      width: '100%',
+                      accentColor: '#60a5fa',
+                    }}
+                  />
+                </div>
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      color: '#cbd5e1',
+                      fontSize: '12px',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    Hover Opacity: {orbitPaths.hoverOpacity}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={orbitPaths.hoverOpacity}
+                    onChange={(e) =>
+                      setOrbitPaths({
+                        ...orbitPaths,
+                        hoverOpacity: parseFloat(e.target.value),
+                      })
+                    }
+                    style={{
+                      width: '100%',
+                      accentColor: '#60a5fa',
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Main Content Area */}
@@ -414,6 +629,8 @@ function App() {
             onItemSelect={handleItemSelect}
             onDialSelect={handleDialSelect}
             animation={animation}
+            groupBy={groupBy}
+            orbitPaths={orbitPaths}
             colors={{
               background: 'transparent',
               ring: 'rgba(100, 116, 139, 0.3)',
@@ -456,6 +673,8 @@ function App() {
             onDialSelect={handleDialSelect}
             renderItem={customItemRenderer}
             animation={animation}
+            groupBy={groupBy}
+            orbitPaths={orbitPaths}
             colors={{
               background: 'transparent',
               ring: 'rgba(100, 116, 139, 0.3)',

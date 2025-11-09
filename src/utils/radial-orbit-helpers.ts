@@ -41,6 +41,29 @@ export const distributeAngles = (count: number, startAngle: number = 0): number[
   return Array.from({ length: count }, (_, i) => startAngle + i * angleStep);
 };
 
+export const distributeAnglesGrouped = (
+  count: number,
+  groupIndex: number,
+  totalGroups: number,
+  startAngle: number = 0
+): number[] => {
+  if (count === 0) return [];
+  if (count === 1) return [startAngle];
+
+  // Calculate the sector size for this group
+  const sectorSize = (Math.PI * 2) / totalGroups;
+  const sectorStart = startAngle + groupIndex * sectorSize;
+  
+  // Distribute items within the sector, leaving some padding
+  const padding = sectorSize * 0.1; // 10% padding on each side
+  const availableAngle = sectorSize - padding * 2;
+  const angleStep = count > 1 ? availableAngle / (count - 1) : 0;
+  
+  return Array.from({ length: count }, (_, i) => 
+    sectorStart + padding + i * angleStep
+  );
+};
+
 export const polarToCartesian = (
   centerX: number,
   centerY: number,
