@@ -42,6 +42,7 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
     orbitRotation: true,
     orbitSpeedBase: 60,
     hoverScale: 1.1,
+    orbits: undefined, // undefined = animate all, [] = animate none, [ids] = animate selected
   },
   colors = {
     background: 'rgba(0, 0, 0, 0.05)',
@@ -63,6 +64,14 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
 
   const centerX = width / 2;
   const centerY = height / 2;
+  
+  // Merge animation defaults to ensure orbits is properly handled
+  const mergedAnimation = {
+    orbitRotation: animation.orbitRotation ?? true,
+    orbitSpeedBase: animation.orbitSpeedBase ?? 60,
+    hoverScale: animation.hoverScale ?? 1.1,
+    orbits: animation.orbits, // Can be undefined, [], or string[]
+  };
   
   // Calculate scale factor based on container size (using minimum dimension for square aspect ratio)
   const minDimension = Math.min(width, height);
@@ -530,19 +539,23 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
             const hasHoveredItem = groupsInOrbit.some(g => g.sortedItems.some(item => hoveredItem === item.id));
             
             // Check if this orbit should animate - check if ANY group in this orbit is selected
-            // If animation.orbits is undefined, animate all. If it's an array (even empty), only animate selected ones.
-            const shouldAnimate = animation.orbitRotation && 
-              (animation.orbits === undefined || 
-               (animation.orbits.length > 0 && groupsInOrbit.some(g => animation.orbits!.includes(g.id))));
+            // If mergedAnimation.orbits is undefined, animate all. If it's an array (even empty), only animate selected ones.
+            const shouldAnimate = mergedAnimation.orbitRotation && 
+              (mergedAnimation.orbits === undefined || 
+               (mergedAnimation.orbits.length > 0 && groupsInOrbit.some(g => mergedAnimation.orbits!.includes(g.id))));
+            
+            // Calculate animation duration and direction
+            const animationDuration = mergedAnimation.orbitSpeedBase! * (orbitIndex % 2 === 0 ? 1 : -1);
+            const animationName = 'radial-orbit-rotate';
             
             return (
               <g
                 key={`orbit-${radius}`}
                 style={{
-                  animation:
-                    shouldAnimate
-                      ? `rotate ${animation.orbitSpeedBase! * (orbitIndex % 2 === 0 ? 1 : -1)}s linear infinite`
-                      : 'none',
+                  animation: shouldAnimate
+                    ? `${animationName} ${Math.abs(animationDuration)}s linear infinite`
+                    : 'none',
+                  animationDirection: shouldAnimate && animationDuration < 0 ? 'reverse' : 'normal',
                   animationPlayState: shouldAnimate && hasHoveredItem ? 'paused' : (shouldAnimate ? 'running' : 'paused'),
                   transformOrigin: `${centerX}px ${centerY}px`,
                 }}
@@ -567,7 +580,7 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
                       const isHovered = hoveredItem === item.id;
                       const isGroupHovered = hoveredGroup === group.id;
                       const scale =
-                        isHovered || isGroupHovered ? animation.hoverScale || 1.1 : 1;
+                        isHovered || isGroupHovered ? mergedAnimation.hoverScale : 1;
 
                       if (renderItem) {
                         return (
@@ -578,7 +591,7 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
                             width={itemRadius * 1.1}
                             height={itemRadius * 1.1}
                             style={{
-                              animation: 'fadeIn 0.5s ease-out',
+                              animation: 'radial-orbit-fadeIn 0.5s ease-out',
                               animationDelay: `${itemIndex * 0.05}s`,
                               animationFillMode: 'backwards',
                             }}
@@ -608,7 +621,7 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
                         <g
                           key={item.id}
                           style={{
-                            animation: 'fadeIn 0.5s ease-out',
+                            animation: 'radial-orbit-fadeIn 0.5s ease-out',
                             animationDelay: `${itemIndex * 0.05}s`,
                             animationFillMode: 'backwards',
                           }}
@@ -684,7 +697,7 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
       )}
 
       <style>{`
-        @keyframes rotate {
+        @keyframes radial-orbit-rotate {
           from {
             transform: rotate(0deg);
           }
@@ -693,7 +706,7 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
           }
         }
 
-        @keyframes fadeIn {
+        @keyframes radial-orbit-fadeIn {
           from {
             opacity: 0;
             transform: scale(0);
