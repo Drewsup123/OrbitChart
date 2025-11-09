@@ -514,6 +514,9 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
         {processedGroups.map((group) => {
           const orbitIndex = ('orbitIndex' in group ? group.orbitIndex : processedGroups.indexOf(group)) as number;
           
+          // Check if any item in this group is hovered
+          const hasHoveredItem = group.sortedItems.some(item => hoveredItem === item.id);
+          
           return (
             <g
               key={group.id}
@@ -522,6 +525,7 @@ const RadialOrbit: React.FC<RadialOrbitProps> = ({
                   animation.orbitRotation
                     ? `rotate ${animation.orbitSpeedBase! * (orbitIndex % 2 === 0 ? 1 : -1)}s linear infinite`
                     : 'none',
+                animationPlayState: animation.orbitRotation && hasHoveredItem ? 'paused' : (animation.orbitRotation ? 'running' : 'paused'),
                 transformOrigin: `${centerX}px ${centerY}px`,
               }}
             >
