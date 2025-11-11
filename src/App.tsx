@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import RadialOrbit from './components/RadialOrbit';
 import ChartControlsSidebar from './documentation_components/ChartControlsSidebar';
+import CodePreviewSidebar from './documentation_components/CodePreviewSidebar';
 import { demoOrbitData } from './data/demo-orbit-data';
 import { userApplicationsData } from './data/user-applications-data';
 import { teamCollaborationData } from './data/team-collaboration-data';
@@ -65,6 +66,8 @@ function App() {
   
   const [itemShape, setItemShape] = useState<ItemShape>('circle');
   
+  const [isCodeDrawerOpen, setIsCodeDrawerOpen] = useState(false);
+  
   // Update visibleGroups when data set changes.
   useEffect(() => {
     const newVisibleGroups: Record<string, boolean> = {};
@@ -121,8 +124,10 @@ function App() {
         position: 'relative',
         display: 'flex',
         paddingLeft: '280px',
+        paddingRight: isCodeDrawerOpen ? '500px' : '0',
         overflowY: 'auto',
         overflowX: 'hidden',
+        transition: 'padding-right 0.3s ease',
       }}
     >
       <ChartControlsSidebar
@@ -339,6 +344,71 @@ function App() {
         )}
       </div>
       )}
+
+      {/* Code Preview Sidebar */}
+      {isCodeDrawerOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            right: 0,
+            top: 0,
+            height: '100vh',
+            zIndex: 999,
+          }}
+        >
+          <CodePreviewSidebar
+            isOpen={isCodeDrawerOpen}
+            onClose={() => setIsCodeDrawerOpen(false)}
+            chartSize={chartSize}
+            animation={animation}
+            itemShape={itemShape}
+            groupBy={groupBy}
+            groupOrbits={groupOrbits}
+            orbitPaths={orbitPaths}
+            colors={{
+              background: 'transparent',
+              ring: 'rgba(100, 116, 139, 0.3)',
+              center: '#1e293b',
+              tooltip: 'rgba(15, 23, 42, 0.95)',
+            }}
+            hasCustomRenderer={false}
+            showCustomRenderer={false}
+          />
+        </div>
+      )}
+
+      {/* Code Preview Toggle Button */}
+      <button
+        onClick={() => setIsCodeDrawerOpen(!isCodeDrawerOpen)}
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: isCodeDrawerOpen ? '520px' : '20px',
+          padding: '12px 20px',
+          backgroundColor: 'rgba(96, 165, 250, 0.2)',
+          border: '1px solid rgba(96, 165, 250, 0.3)',
+          borderRadius: '8px',
+          color: '#cbd5e1',
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: 500,
+          zIndex: 1001,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          transition: 'all 0.3s ease',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(96, 165, 250, 0.3)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(96, 165, 250, 0.2)';
+        }}
+      >
+        <span>📋</span>
+        <span>{isCodeDrawerOpen ? 'Hide' : 'Show'} Code</span>
+      </button>
     </div>
   );
 }
