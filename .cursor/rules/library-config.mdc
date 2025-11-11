@@ -1,0 +1,29 @@
+---
+alwaysApply: true
+---
+
+1. The library exports only one component: OrbitChart.
+2. All chart behavior and configuration happen inside OrbitChart.
+3. OrbitChart accepts props for:
+   - data (array)
+   - width, height (numbers)
+   - renderPoint, renderTooltip (custom renderers)
+   - scales, theme (optional)
+4. Do not create multiple exported hooks, utils, or contexts. Keep all logic scoped to OrbitChart.
+5. Code must be 100% React and TypeScript — no external chart or DOM libraries.
+6. Use SVG and React rendering only; no canvas or imperative drawing.
+7. No window, document, or manual DOM manipulation.
+8. No mutable globals, side effects, or external state managers.
+9. Keep all derived calculations pure functions or useMemo.
+10. Props are the only source of truth. No internal data mutation.
+11. Allow user renderers (renderPoint, renderTooltip) to override internal rendering.
+12. Use React.FC or function components only.
+13. Avoid unnecessary re-renders with memo/useCallback.
+14. Always provide default width=400, height=240 if not passed.
+15. If data is empty, render an empty SVG placeholder with text “No data”.
+16. Keep file small: OrbitChart.tsx should define everything except large math helpers.
+17. Internal helpers go in orbitMath.ts, not exported.
+18. Always type everything with explicit interfaces (e.g., OrbitChartProps).
+19. Do not expose implementation details or internal helpers.
+20. Write code that looks like a clean, pure React library: readable, stateless, and declarative.
+

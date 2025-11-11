@@ -62,7 +62,7 @@ function App() {
     hoverOpacity: 0.9,
   });
   
-  // Update visibleGroups when data set changes
+  // Update visibleGroups when data set changes.
   useEffect(() => {
     const newVisibleGroups: Record<string, boolean> = {};
     currentData.groups.forEach(group => {
@@ -86,56 +86,27 @@ function App() {
     console.log('Dial selected:', index);
   };
 
-  // React component for custom item rendering
-  const CustomItemCard = ({ item, radius, scale }: { item: RadialOrbitItem; isHovered: boolean; radius: number; scale: number }) => {
-    const size = radius * scale * 2;
-    
+  // Custom renderer that uses foreignObject to render React component
+  const customItemRenderer = (props: ItemRendererProps) => {
+    const { item, radius, scale } = props;
+
     return (
       <div
         style={{
-          width: size,
-          height: size,
-          borderRadius: '50%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '8px',
-          transition: 'all 0.3s ease',
-          cursor: 'pointer',
-          overflow: 'hidden',
-          backgroundColor: "#fff"
-        }}
-      >
-        <div style={{
-          backgroundImage: `url(${item.iconUrl})`,
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
           width: '100%',
           height: '100%',
-        }} />
-      </div>
-    );
-  };
-
-  // Custom renderer that uses foreignObject to render React component
-  const customItemRenderer = (props: ItemRendererProps) => {
-    const { item, radius, scale, isHovered } = props;
-    const size = radius * scale * 2;
-
-    return (
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <CustomItemCard item={item} isHovered={isHovered} radius={radius} scale={scale} />
-        </div>
+          borderRadius: '50%',
+          overflow: 'hidden',
+          border: '2px solid rgba(255, 255, 255, 0.3)',
+          backgroundImage: `url(${item.iconUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          transition: 'all 0.3s ease',
+          cursor: 'pointer',
+          boxSizing: 'border-box',
+        }}
+      />
     );
   };
 
